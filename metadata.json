@@ -1,0 +1,5 @@
+{
+  "name": "Camisa Wallpaper Gerador",
+  "description": "Create personalized football jersey wallpapers using Gemini 2.5 Flash Image. Generate unique designs and edit them with natural language prompts.",
+  "requestFramePermissions": []
+}
