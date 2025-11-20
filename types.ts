@@ -13,3 +13,11 @@ export interface GenerationState {
   error: string | null;
   imageData: string | null; // Base64 string
 }
+
+export interface HistoryItem {
+  id: string;
+  imageData: string;
+  timestamp: number;
+  params: WallpaperParams;
+  type: 'generated' | 'edited';
+}
