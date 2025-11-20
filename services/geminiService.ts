@@ -14,7 +14,7 @@ const constructPrompt = (params: WallpaperParams): string => {
   const orientation = isMobile ? "vertical" : "horizontal";
   // Use descriptive terms instead of numbers to prevent text leakage
   const ratioDesc = isMobile ? "Portrait Mode (Tall)" : "Cinematic Mode (Wide)"; 
-  const compType = isMobile ? "poster" : "desktop wallpaper";
+  const compType = isMobile ? "mobile wallpaper" : "desktop wallpaper";
   const composition = isMobile ? "Maintain vertical composition" : "Maintain horizontal cinematic composition";
 
   const crestInstruction = hasLogo
@@ -25,7 +25,8 @@ const constructPrompt = (params: WallpaperParams): string => {
     ? "No photorealistic jersey.\nNo real player face.\nNo neon overload."
     : "No photorealistic jersey.\nNo real club crest.\nNo real player face.\nNo neon overload.";
 
-  const technicalProhibition = `The text "${isMobile ? '9:16' : '16:9'}".\nTechnical specs text.\nWatermarks.`;
+  // REMOVED specific numbers (9:16/16:9) from the prohibited text because mentioning them can cause the model to print them.
+  const technicalProhibition = `Text indicating dimensions.\nAspect ratio numbers.\nWatermarks.\nTechnical specs.`;
 
   return `
 You are generating a ${orientation} ${ratioDesc} illustrated football ${compType} inspired by the back of a personalized jersey.
@@ -55,6 +56,11 @@ BACKGROUND:
 ${orientation} ${compType} with ${ratioDesc}.
 Geometric shapes, textured strokes, modern sports composition.
 Keep it artistic, stylish, premium, and visually striking.
+
+TEXT RULES:
+The ONLY allowed text is the name "${params.nome}" and the number "${params.numero}".
+DO NOT write any other text.
+DO NOT write the aspect ratio or dimensions.
 
 PROHIBITED:
 ${technicalProhibition}
