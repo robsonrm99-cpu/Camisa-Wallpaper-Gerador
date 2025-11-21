@@ -93,6 +93,10 @@ export const generateWallpaper = async (params: WallpaperParams): Promise<string
         const response = await client.models.generateContent({
           model: GEMINI_MODEL,
           contents: { parts },
+          config: {
+            // @ts-ignore - Force image generation
+            responseModalities: ['IMAGE'],
+          }
         });
 
         const candidates = response.candidates;
@@ -171,6 +175,10 @@ export const editWallpaper = async (currentImageBase64: string, instruction: str
                 }
             }
         ]
+      },
+      config: {
+        // @ts-ignore - Force image generation
+        responseModalities: ['IMAGE'],
       }
     });
 
