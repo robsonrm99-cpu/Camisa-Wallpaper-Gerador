@@ -4,17 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FutArt - Criador de Wallpapers</title>
-    
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5825383414903105"
-         crossorigin="anonymous"></script>
-
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Anton&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Runtime Environment Configuration -->
+    <script>
+      window.process = {
+        env: {
+          API_KEY: "AIzaSyAVDQrotKh3yFW7qtBiUlJu-pWjtwqEzdM"
+        }
+      };
+    </script>
+
     <script type="importmap">
     {
       "imports": {
@@ -28,17 +33,6 @@
     </script>
 </head>
 <body class="antialiased text-slate-200 bg-slate-950">
-    <!-- Google AdSense Unit -->
-    <ins class="adsbygoogle"
-         style="display:block; margin: 20px auto; text-align:center;"
-         data-ad-client="ca-pub-5825383414903105"
-         data-ad-slot="1234567890"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>
-         (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
 </body>

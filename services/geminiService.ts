@@ -9,77 +9,73 @@ const constructPrompt = (params: WallpaperParams): string => {
   const isMobile = params.aspectRatio === '9:16';
   
   const orientation = isMobile ? "vertical" : "horizontal";
-  const ratioDesc = isMobile ? "Portrait Mode (Tall)" : "Cinematic Mode (Wide)"; 
-  const compType = isMobile ? "mobile wallpaper" : "desktop wallpaper";
-  const composition = isMobile ? "Maintain vertical composition" : "Maintain horizontal cinematic composition";
+  const ratioStr = isMobile ? "9:16" : "16:9";
+
+  // Specific logic for the unified Gender version
+  const genderInstructions = params.genero === 'feminino'
+    ? `FEMININE VERSION:
+       - Player silhouette must be FEMALE (athletic, fitted jersey cut).
+       - Hairstyle: Ponytail, bun, or braided hair visible from behind.
+       - Posture: Strong, elegant, dynamic sport stance.
+       - No sexualization, focus on professional athlete aesthetic.`
+    : `MASCULINE VERSION:
+       - Player silhouette must be MALE (broad shoulders, athletic build).
+       - Hairstyle: Short fade or modern soccer player haircut.
+       - Posture: Dominant, powerful, ready for action.`;
 
   const crestInstruction = hasLogo
-    ? "Below the number, place the club crest. A reference image is provided; try to incorporate this logo design clearly on the back of the jersey or as a central element below the number."
-    : "Below the number, place a generic symbolic crest inspired by the colors (NOT a real trademarked crest).";
-
-  const prohibitedSection = hasLogo
-    ? "No photorealistic jersey.\nNo real player face.\nNo neon overload."
-    : "No photorealistic jersey.\nNo real club crest.\nNo real player face.\nNo neon overload.";
-
-  const technicalProhibition = `Text indicating dimensions.\nAspect ratio numbers.\nWatermarks.\nTechnical specs.`;
+    ? "CLUB LOGO: A reference image of the logo is provided. INTEGRATE this exact logo design on the back of the jersey or floating dramatically below the number."
+    : "CLUB LOGO: Create a artistic, symbolic crest inspired by the club colors (do not generate text inside the crest, keep it abstract/geometric).";
 
   return `
-You are generating a ${orientation} ${ratioDesc} illustrated football ${compType} inspired by the back of a personalized jersey.
-CONCEPT ART / FAN ART ONLY.
+You are generating a ${orientation} ${ratioStr} illustration.
 
-Create a modern sports-art ${compType} showing the BACK VIEW of a football player.
+TASK: Create a High-Quality Football Jersey Wallpaper (Back View).
+TARGET ASPECT RATIO: ${ratioStr} (${orientation}).
 
-GENDER OF PLAYER: ${params.genero} (options: "masculino" or "feminino")
-NAME ON JERSEY: ${params.nome}
-JERSEY NUMBER: ${params.numero}
-CLUB THEME: ${params.clube}
+USER PARAMETERS:
+- CLUB: ${params.clube}
+- NAME: ${params.nome} (Uppercase, Bold typography on Jersey)
+- NUMBER: ${params.numero} (Large, Central typography on Jersey)
+- GENDER: ${params.genero}
 
-STYLE RULES:
-Use a clean illustrated sports style (not photorealistic).
-Do NOT generate an actual photograph of a jersey.
-Create an artistic wallpaper INSPIRED by the club’s shirt, not a direct replica.
-Use the official club colors and stripe patterns, but in a creative interpretation.
-${composition} and high contrast.
-Use dynamic brush strokes, geometric bars, and textured backgrounds.
-Player seen from behind, centered, athletic silhouette.
-For feminine players: elegant and strong, no sexualization, optional tied hair.
-For masculine players: athletic silhouette, short hair silhouette.
-Large, bold editable number “${params.numero}” centered on the back.
-Editable player name “${params.nome}” above the number in bold uppercase.
-${crestInstruction}
+VISUAL STYLE:
+- CONCEPT ART / DIGITAL ILLUSTRATION (Not a photo, not a 3D render).
+- Art Style: Modern Sports Graphics, dynamic brush strokes, high contrast, dramatic lighting.
+- Background: Abstract stadium atmosphere, club colors in smoke/neon/geometric patterns. Matches the ${params.clube} theme perfectly.
 
-BACKGROUND:
-${orientation} ${compType} with ${ratioDesc}.
-Geometric shapes, textured strokes, modern sports composition.
-Keep it artistic, stylish, premium, and visually striking.
+${genderInstructions}
 
-TEXT RULES:
-The ONLY allowed text is the name "${params.nome}" and the number "${params.numero}".
-DO NOT write any other text.
-DO NOT write the aspect ratio or dimensions.
+COMPOSITION:
+- View: FROM BEHIND (Back of the player).
+- Subject: 1 Player centered.
+- The Name "${params.nome}" must be clearly legible above the number.
+- The Number "${params.numero}" must be the central focal point.
+- ${crestInstruction}
 
-PROHIBITED:
-${technicalProhibition}
-${prohibitedSection}
+STRICT CONSTRAINTS:
+- DO NOT generate faces (player is facing away).
+- DO NOT generate text other than "${params.nome}" and "${params.numero}".
+- DO NOT generate watermarks or technical info.
+- IMAGE MUST BE FULL BLEED ${ratioStr}.
 
-OVERALL FEEL:
-A premium football-art wallpaper inspired by the club ${params.clube}, customizable with the user’s name and number.
+MAKE IT EPIC.
 `;
 };
 
 export const generateWallpaper = async (params: WallpaperParams): Promise<string> => {
   try {
-    const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    // Use the key from window.process (injected in index.html) or process.env
+    // @ts-ignore
+    const apiKey = (window.process?.env?.API_KEY) || process.env.API_KEY;
+    if (!apiKey) throw new Error("API Key missing. Please check configuration.");
+
+    const client = new GoogleGenAI({ apiKey });
     const prompt = constructPrompt(params);
 
     // Helper function to use Gemini 2.5 Flash Image
-    // Used either as primary (if logo present) or fallback (if Imagen fails)
     const generateWithGemini = async () => {
-        const ratioInstruction = params.aspectRatio === '9:16' 
-            ? "OUTPUT IMAGE MUST BE VERTICAL (TALL FORMAT)." 
-            : "OUTPUT IMAGE MUST BE HORIZONTAL (WIDE FORMAT).";
-
-        const parts: any[] = [{ text: `${prompt}\n\nCRITICAL LAYOUT: ${ratioInstruction}` }];
+        const parts: any[] = [{ text: prompt }];
 
         if (params.logoBase64) {
             parts.push({
@@ -94,43 +90,41 @@ export const generateWallpaper = async (params: WallpaperParams): Promise<string
           model: GEMINI_MODEL,
           contents: { parts },
           config: {
-            // @ts-ignore - Force image generation
-            responseModalities: ['IMAGE'],
+              // Gemini 2.5 Flash Image doesn't strictly support aspectRatio in config, 
+              // so we rely heavily on the prompt instructions.
           }
         });
 
         const candidates = response.candidates;
         if (candidates && candidates[0]?.content?.parts) {
-            let textReason = '';
             for (const part of candidates[0].content.parts) {
                 if (part.inlineData && part.inlineData.data) {
                     return part.inlineData.data;
                 }
-                if (part.text) {
-                    textReason += part.text;
-                }
             }
-            if (textReason) {
-                console.warn("Gemini returned text instead of image:", textReason);
-                // If it's a refusal, it often starts with "I cannot..."
-                throw new Error(`O modelo não pôde gerar a imagem. Motivo: ${textReason.substring(0, 150)}...`);
-            }
+            // If text returned (refusal or explanation)
+             const textPart = candidates[0].content.parts.find(p => p.text);
+             if (textPart) {
+                 throw new Error(`Gemini Response: ${textPart.text.substring(0, 100)}...`);
+             }
         }
-        throw new Error("O modelo não retornou dados de imagem (resposta vazia).");
+        throw new Error("O modelo não retornou dados de imagem.");
     };
 
     // STRATEGY:
-    // 1. If NO logo: Try Imagen 4.0 first. If it fails (e.g. Quota), Fallback to Gemini 2.5 Flash.
-    // 2. If LOGO exists: Must use Gemini 2.5 Flash (Multimodal).
+    // 1. If LOGO provided -> MUST use Gemini (Multimodal).
+    // 2. If NO LOGO -> Try Imagen 4.0 (Better Prompt Adherence) -> Fallback to Gemini.
 
-    if (!params.logoBase64) {
+    if (params.logoBase64) {
+        return await generateWithGemini();
+    } else {
         try {
             const response = await client.models.generateImages({
                 model: IMAGEN_MODEL,
                 prompt: prompt,
                 config: {
                     numberOfImages: 1,
-                    aspectRatio: params.aspectRatio,
+                    aspectRatio: params.aspectRatio, // Imagen supports strict aspect ratio
                     outputMimeType: 'image/jpeg',
                 }
             });
@@ -138,36 +132,34 @@ export const generateWallpaper = async (params: WallpaperParams): Promise<string
             if (response.generatedImages?.[0]?.image?.imageBytes) {
                 return response.generatedImages[0].image.imageBytes;
             }
-            throw new Error("No image data received from Imagen.");
+            throw new Error("Imagen returned no data.");
         } catch (imagenError: any) {
-            console.warn("Imagen 4.0 generation failed. Attempting fallback to Gemini 2.5 Flash.", imagenError);
-            // Fallback to Gemini
+            console.warn("Imagen failed, falling back to Gemini:", imagenError);
             return await generateWithGemini();
         }
-    } else {
-        // Direct use of Gemini for Multimodal input
-        return await generateWithGemini();
     }
 
   } catch (error: any) {
     console.error("Error generating wallpaper:", error);
     const msg = error.toString().toLowerCase();
     if (msg.includes('429') || msg.includes('quota') || msg.includes('resource_exhausted')) {
-        throw new Error("Cota de uso excedida temporariamente. Tente novamente em alguns instantes.");
+        throw new Error("Muitos acessos agora. Tente novamente em 30 segundos.");
     }
-    // Re-throw nice messages
     throw error;
   }
 };
 
 export const editWallpaper = async (currentImageBase64: string, instruction: string): Promise<string> => {
   try {
-    const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    // @ts-ignore
+    const apiKey = (window.process?.env?.API_KEY) || process.env.API_KEY;
+    const client = new GoogleGenAI({ apiKey });
+    
     const response = await client.models.generateContent({
       model: GEMINI_MODEL,
       contents: {
         parts: [
-            { text: instruction },
+            { text: `EDIT INSTRUCTION: ${instruction}. Maintain the football jersey theme.` },
             {
                 inlineData: {
                     mimeType: 'image/png',
@@ -175,10 +167,6 @@ export const editWallpaper = async (currentImageBase64: string, instruction: str
                 }
             }
         ]
-      },
-      config: {
-        // @ts-ignore - Force image generation
-        responseModalities: ['IMAGE'],
       }
     });
 
@@ -191,13 +179,9 @@ export const editWallpaper = async (currentImageBase64: string, instruction: str
         }
     }
     
-    throw new Error("O modelo não retornou a imagem editada.");
+    throw new Error("Falha na edição da imagem.");
   } catch (error: any) {
     console.error("Error editing wallpaper:", error);
-    const msg = error.toString().toLowerCase();
-    if (msg.includes('429') || msg.includes('quota') || msg.includes('resource_exhausted')) {
-        throw new Error("Muitos pedidos simultâneos. Aguarde um momento.");
-    }
     throw error;
   }
 };
