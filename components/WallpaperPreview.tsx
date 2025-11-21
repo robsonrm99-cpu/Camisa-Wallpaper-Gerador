@@ -1,14 +1,24 @@
 import React from 'react';
-import { Download, Wand2, Image as ImageIcon, Share2 } from 'lucide-react';
+import { Download, Wand2, Image as ImageIcon, Share2, History } from 'lucide-react';
+import { HistoryItem } from '../types';
 
 interface WallpaperPreviewProps {
   imageData: string | null;
   isLoading: boolean;
   onEdit: (instruction: string) => void;
   aspectRatio: '9:16' | '16:9';
+  history: HistoryItem[];
+  onSelectHistory: (item: HistoryItem) => void;
 }
 
-export const WallpaperPreview: React.FC<WallpaperPreviewProps> = ({ imageData, isLoading, onEdit, aspectRatio }) => {
+export const WallpaperPreview: React.FC<WallpaperPreviewProps> = ({ 
+  imageData, 
+  isLoading, 
+  onEdit, 
+  aspectRatio,
+  history,
+  onSelectHistory
+}) => {
   const [editPrompt, setEditPrompt] = React.useState('');
 
   const handleDownload = () => {
@@ -123,6 +133,41 @@ export const WallpaperPreview: React.FC<WallpaperPreviewProps> = ({ imageData, i
                     </button>
                 </form>
             </div>
+        </div>
+      )}
+
+      {/* History Section */}
+      {history.length > 0 && (
+        <div className={`${containerClass} pt-4 animate-in slide-in-from-bottom-6 fade-in duration-700`}>
+          <div className="bg-black/20 border border-white/5 rounded-2xl p-4 backdrop-blur-sm">
+             <div className="flex items-center justify-between mb-3 px-1">
+                <div className="flex items-center gap-2">
+                    <History className="w-3 h-3 text-slate-400" />
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Histórico</h3>
+                </div>
+                <span className="text-[10px] text-slate-600 bg-white/5 px-2 py-0.5 rounded-full">{history.length}</span>
+             </div>
+             
+             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                {history.map((item, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => onSelectHistory(item)}
+                    className={`relative flex-shrink-0 rounded-lg overflow-hidden transition-all duration-300 group h-16 w-auto aspect-[9/16] border ${
+                      imageData === item.data 
+                        ? 'border-emerald-500 ring-2 ring-emerald-500/20' 
+                        : 'border-white/10 opacity-60 hover:opacity-100 hover:border-white/30'
+                    }`}
+                  >
+                    <img 
+                      src={`data:image/png;base64,${item.data}`} 
+                      alt={`Histórico ${idx}`}
+                      className="h-full w-full object-cover" 
+                    />
+                  </button>
+                ))}
+             </div>
+          </div>
         </div>
       )}
     </div>

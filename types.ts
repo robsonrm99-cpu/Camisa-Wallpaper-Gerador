@@ -15,9 +15,7 @@ export interface GenerationState {
 }
 
 export interface HistoryItem {
-  id: string;
-  imageData: string;
+  data: string; // Base64 string
+  aspectRatio: '9:16' | '16:9';
   timestamp: number;
-  params: WallpaperParams;
-  type: 'generated' | 'edited';
 }
