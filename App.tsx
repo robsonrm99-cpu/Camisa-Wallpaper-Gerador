@@ -3,7 +3,7 @@ import { InputForm } from './components/InputForm';
 import { WallpaperPreview } from './components/WallpaperPreview';
 import { WallpaperParams, GenerationState, HistoryItem } from './types';
 import { generateWallpaper, editWallpaper } from './services/geminiService';
-import { Zap, AlertCircle, Trophy, X, ShieldCheck } from 'lucide-react';
+import { Zap, AlertCircle, Trophy, X, ShieldCheck, HelpCircle, Star, Sparkles } from 'lucide-react';
 import { Footer } from './components/Footer';
 import { AboutPage, ContactPage, PrivacyPage, TermsPage } from './components/StaticPages';
 
@@ -48,6 +48,15 @@ const CookieBanner: React.FC = () => {
     </div>
   );
 };
+
+const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, answer }) => (
+  <div className="bg-white/5 border border-white/5 rounded-xl p-6 hover:bg-white/10 transition-colors">
+    <h4 className="text-emerald-400 font-bold mb-2 flex items-center gap-2">
+      <HelpCircle className="w-4 h-4" /> {question}
+    </h4>
+    <p className="text-slate-400 text-sm leading-relaxed">{answer}</p>
+  </div>
+);
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('home');
@@ -168,32 +177,66 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      {/* SEO Content Section (Required for AdSense Content Value) */}
-      <div className="max-w-4xl mx-auto border-t border-white/5 pt-16 animate-in fade-in slide-in-from-bottom-8 duration-700">
-        <h3 className="font-jersey text-3xl text-slate-300 uppercase mb-6 text-center">Como criar o Wallpaper de Futebol Perfeito</h3>
-        <div className="grid md:grid-cols-3 gap-8 text-slate-400">
-            <div className="space-y-2">
-              <h4 className="text-emerald-400 font-bold uppercase text-sm">1. Escolha do Time</h4>
-              <p className="text-sm leading-relaxed">
-                Para melhores resultados, insira o nome completo do clube (ex: "Sociedade Esportiva Palmeiras"). 
-                Nossa IA reconhece as cores e padrões oficiais dos maiores times do Brasil e do mundo.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <h4 className="text-emerald-400 font-bold uppercase text-sm">2. Personalização</h4>
-              <p className="text-sm leading-relaxed">
-                Adicione seu nome e número da sorte. A inteligência artificial ajusta a tipografia para combinar com o estilo esportivo,
-                criando uma camisa virtual realista vista de costas.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <h4 className="text-emerald-400 font-bold uppercase text-sm">3. Edição Mágica</h4>
-              <p className="text-sm leading-relaxed">
-                Após gerar, use o campo de edição para adicionar efeitos como "chuva intensa", "fumaça de sinalizador" ou "estádio lotado ao fundo"
-                para dar um toque épico à sua arte.
-              </p>
-            </div>
+      {/* Content Rich Section for AdSense Value */}
+      <div className="border-t border-white/5 pt-16 animate-in fade-in slide-in-from-bottom-8 duration-700 space-y-12">
+        
+        {/* How It Works */}
+        <div className="max-w-4xl mx-auto text-center space-y-8">
+          <h3 className="font-jersey text-3xl text-slate-300 uppercase">Como funciona o FutArt?</h3>
+          <div className="grid md:grid-cols-3 gap-8 text-left">
+              <div className="bg-black/20 p-6 rounded-2xl border border-white/5">
+                <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center mb-4">
+                  <Star className="w-5 h-5 text-emerald-400" />
+                </div>
+                <h4 className="text-white font-bold mb-2">1. Personalização</h4>
+                <p className="text-sm text-slate-400 leading-relaxed">
+                  Insira o nome do seu clube (ex: "Flamengo", "Corinthians"), seu nome e número favorito. Nossa IA identifica as cores e padrões oficiais.
+                </p>
+              </div>
+              <div className="bg-black/20 p-6 rounded-2xl border border-white/5">
+                <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center mb-4">
+                  <Sparkles className="w-5 h-5 text-purple-400" />
+                </div>
+                <h4 className="text-white font-bold mb-2">2. Geração IA</h4>
+                <p className="text-sm text-slate-400 leading-relaxed">
+                  Utilizamos o modelo Gemini 2.5 Flash para criar uma arte vetorial estilo "E-Sports" em segundos, com alta resolução para celular ou PC.
+                </p>
+              </div>
+              <div className="bg-black/20 p-6 rounded-2xl border border-white/5">
+                <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center mb-4">
+                  <Zap className="w-5 h-5 text-blue-400" />
+                </div>
+                <h4 className="text-white font-bold mb-2">3. Edição Mágica</h4>
+                <p className="text-sm text-slate-400 leading-relaxed">
+                  Não gostou de algum detalhe? Use o campo de edição para pedir alterações como "adicionar chuva", "mudar o fundo" ou "ajustar iluminação".
+                </p>
+              </div>
+          </div>
         </div>
+
+        {/* FAQ Section */}
+        <div className="max-w-3xl mx-auto w-full">
+           <h3 className="font-jersey text-3xl text-slate-300 uppercase mb-8 text-center">Perguntas Frequentes (FAQ)</h3>
+           <div className="space-y-4">
+              <FAQItem 
+                question="O serviço é gratuito?"
+                answer="Sim, o FutArt é 100% gratuito. Mantemos a ferramenta no ar através de anúncios exibidos na página."
+              />
+              <FAQItem 
+                question="Posso usar as imagens comercialmente?"
+                answer="Não. As imagens são geradas como 'Fan Art' para uso pessoal (papel de parede, redes sociais). Elas podem conter elementos protegidos por direitos de imagem dos clubes."
+              />
+              <FAQItem 
+                question="Por que o escudo do meu time ficou diferente?"
+                answer="A IA recria os escudos com base em referências artísticas para evitar cópias exatas que violem direitos autorais. Para maior precisão, recomendamos fazer o upload do logo oficial no formulário."
+              />
+              <FAQItem 
+                question="Quais times são compatíveis?"
+                answer="O sistema reconhece os principais times do Brasil (Flamengo, Palmeiras, São Paulo, Vasco, etc.) e do mundo (Real Madrid, Barcelona, City). Para times menores, descreva as cores no campo de edição se necessário."
+              />
+           </div>
+        </div>
+
       </div>
     </div>
   );
