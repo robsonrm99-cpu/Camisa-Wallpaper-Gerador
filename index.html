@@ -3,8 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FutArt | Camisa Wallpaper Gerador</title>
-    <meta name="description" content="Crie wallpapers de futebol personalizados com IA. Escolha seu time, nome e número.">
+    <title>FutArt | Gerador de Camisa de Futebol e Wallpapers com IA</title>
+    
+    <!-- SEO Meta Tags Optimized -->
+    <meta name="description" content="Crie wallpapers de futebol personalizados com IA. Insira seu nome e número na camisa do seu time (Flamengo, Corinthians, Palmeiras e mais). Estilo E-Sports e Cartoon.">
+    <meta name="keywords" content="gerador de camisa futebol, wallpaper futebol, criar camisa time, inteligência artificial, gemini ai, poster futebol, wallpaper celular, futart, fan art futebol">
+    <meta name="author" content="FutArt">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#020617">
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://futart.app/">
+    <meta property="og:title" content="FutArt | Gerador de Wallpapers de Futebol com IA">
+    <meta property="og:description" content="Personalize a camisa do seu time do coração com seu nome e número em segundos. Arte digital de alta qualidade.">
+    <meta property="og:image" content="https://futart.app/og-image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="FutArt | Gerador de Wallpapers de Futebol">
+    <meta property="twitter:description" content="Crie sua camisa personalizada agora.">
+
+    <!-- Google AdSense -->
+    <meta name="google-adsense-account" content="ca-pub-5825383414903105">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5825383414903105"
+     crossorigin="anonymous"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Anton&display=swap" rel="stylesheet">
     <style>
@@ -44,19 +68,19 @@
 <script type="importmap">
 {
   "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
     "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
     "vite": "https://aistudiocdn.com/vite@^7.2.4",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
     "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1"
   }
 }
 </script>
 </head>
-  <body class="antialiased text-slate-200 selection:bg-emerald-500/30 selection:text-emerald-200">
-    <div id="root"></div>
+  <body class="antialiased text-slate-200 selection:bg-emerald-500/30 selection:text-emerald-200 flex flex-col min-h-screen">
+    <div id="root" class="flex-grow"></div>
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>

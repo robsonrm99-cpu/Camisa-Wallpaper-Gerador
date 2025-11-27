@@ -6,67 +6,78 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const GEMINI_MODEL = 'gemini-2.5-flash-image';
 
+// Helper to get specific kit details based on club name
+const getClubKitRules = (clubName: string): string => {
+  const club = clubName.toLowerCase();
+  
+  if (club.includes('corinthians')) return 'OFFICIAL KIT: White/Black. PATTERN: Vertical thin pinstripes (Black) on White base OR All Black with white details. FONT: White/Black blocky numbers.';
+  if (club.includes('flamengo')) return 'OFFICIAL KIT: Red/Black. PATTERN: Thick Horizontal Hoops (Red and Black stripes). FONT: White or Gold bold numbers.';
+  if (club.includes('palmeiras')) return 'OFFICIAL KIT: Emerald Green. PATTERN: Clean Green base with subtle geometric texture or white trim. FONT: White numbers.';
+  if (club.includes('são paulo') || club.includes('sao paulo')) return 'OFFICIAL KIT: White base. DETAILS: On the back, usually clean white, red/black numbers. (Note: The chest stripes are on front, back is clean).';
+  if (club.includes('grêmio') || club.includes('gremio')) return 'OFFICIAL KIT: Tricolor (Blue, Black, White). PATTERN: Vertical stripes (Blue center, Black sides, White thin separators).';
+  if (club.includes('inter') && club.includes('nac')) return 'OFFICIAL KIT: Red base. PATTERN: Clean Red with White details. FONT: White.';
+  if (club.includes('vasco')) return 'OFFICIAL KIT: Black base. PATTERN: White Diagonal Sash (Faixa Diagonal) - Note: Sash usually goes front to back. If unsure, use All Black with White Cross emblem.';
+  if (club.includes('santos')) return 'OFFICIAL KIT: All White. PATTERN: Clean White base. FONT: Black numbers.';
+  if (club.includes('botafogo')) return 'OFFICIAL KIT: Black/White. PATTERN: Vertical Stripes (Black and White). FONT: White/Black.';
+  if (club.includes('fluminense')) return 'OFFICIAL KIT: Green/Maroon (Garnet). PATTERN: Vertical Stripes (Green and Maroon with thin White borders).';
+  if (club.includes('cruzeiro')) return 'OFFICIAL KIT: Royal Blue. PATTERN: Clean Blue base with White details (Southern Cross stars).';
+  if (club.includes('atlético mineiro') || club.includes('galo')) return 'OFFICIAL KIT: Black/White. PATTERN: Vertical Stripes (Black and White).';
+  
+  if (club.includes('real madrid')) return 'OFFICIAL KIT: All White. PATTERN: Clean White with Gold or Black trim.';
+  if (club.includes('barcelona')) return 'OFFICIAL KIT: Blue/Red (Blaugrana). PATTERN: Vertical wide stripes.';
+  if (club.includes('city')) return 'OFFICIAL KIT: Sky Blue. PATTERN: Clean Sky Blue base.';
+  
+  // Generic Fallback but enforcing team colors
+  return `OFFICIAL KIT for '${clubName}'. USE THE REAL LIFE OFFICIAL PATTERN AND COLORS OF THIS TEAM.`;
+};
+
 const constructPrompt = (params: WallpaperParams): string => {
   const hasLogo = !!params.logoBase64;
-  
-  // Enhanced Club Identity & Kit Logic
-  const kitContext = `
-CRITICAL VISUAL IDENTITY RULES:
-1. IDENTIFY THE CLUB: Apply the CORRECT PATTERN for "${params.clube}".
-   - If "Corinthians", "Atlético Mineiro", "Botafogo", "Santos": Use VERTICAL STRIPES (Black/White).
-   - If "Flamengo", "Sport", "Vitória": Use HORIZONTAL HOOPS (Red/Black).
-   - If "Palmeiras": Emerald Green (Geometric pattern).
-   - If "São Paulo": White base with Red/White/Black chest stripes.
-   - If "Grêmio": Blue/Black/White vertical stripes.
-   - If "Fluminense": Green/Maroon vertical stripes.
-   - If "Vasco": Black with White diagonal sash (or vice-versa).
-   
-2. COLORS: Use the EXACT official hex codes. Vibrant and Saturated.
-`;
+  const kitRules = getClubKitRules(params.clube);
 
-  // Enhanced Gender/Silhouette Logic - STYLIZED
+  // Enhanced Gender/Silhouette Logic
   const genderContext = params.genero === 'feminino'
-    ? "FEMALE FOOTBALL PLAYER BACK VIEW. Physique: Athletic, stylized hero proportions, ponytail hairstyle. Jersey fit: Tapered waist."
-    : "MALE FOOTBALL PLAYER BACK VIEW. Physique: Muscular, broad shoulders (V-taper), modern haircut (fade).";
+    ? "FEMALE FOOTBALL PLAYER BACK VIEW. Physique: Athletic, fit, ponytail or bun hairstyle. Jersey fit: Women's cut (slightly tapered waist)."
+    : "MALE FOOTBALL PLAYER BACK VIEW. Physique: Muscular, broad shoulders (V-shape back), modern fade haircut.";
 
-  // Enhanced Logo Logic
+  // Logo Logic - Strict Adherence
   const logoInstruction = hasLogo
-    ? `A CUSTOM LOGO IMAGE IS PROVIDED. 
-       ACTION: Place this logo on the NAPE (back of neck) OR as a large stylized watermark at the bottom.
-       EXECUTION: Make it look like a printed vector graphic on the shirt.`
-    : `NO CUSTOM LOGO. 
-       ACTION: Create a stylized vector emblem shape on the nape of the neck.`;
+    ? `**CUSTOM LOGO PROVIDED**: 
+       - You MUST place the provided logo image on the shirt.
+       - LOCATION: Center of the back (below the number) OR Nape of the neck.
+       - STYLE: Integrate it as a high-quality print. DO NOT DISTORT the logo shape.`
+    : `**NO CUSTOM LOGO**: 
+       - DRAW THE OFFICIAL CREST/LOGO OF "${params.clube}". 
+       - LOCATION: Nape of the neck (small) OR bottom hem watermark.
+       - ACCURACY: Try to replicate the official shape and colors of the ${params.clube} crest exactly. Do not invent a generic shield.`;
 
   return `
-GENERATE A HIGH-QUALITY DIGITAL VECTOR ILLUSTRATION (E-SPORTS POSTER STYLE).
-
-STYLE REFERENCE:
-- **Visual Style**: Modern Vector Art, Cel-Shaded, Comic Book Realism (similar to GTA loading screens or high-end sports marketing illustrations).
-- **Rendering**: BOLD OUTLINES, flat shading with hard edges, vibrant saturated colors. **NOT** photorealistic. **NOT** 3D render.
-- **Artistic Technique**: Digital painting, clean lines, ink splotches.
+GENERATE A MASTERPIECE FOOTBALL WALLPAPER.
+STYLE: "E-Sports Vector Art" / "GTA Loading Screen Style".
+RENDERING: High contrast, cel-shaded, vibrant colors, sharp vector lines.
 
 SUBJECT:
 ${genderContext}
-Position: Facing away from camera (Back View).
-Skin: Smooth vector coloring with sharp shadows (Cel-shading).
+POSITION: Seen from behind (Back View). Camera close-up on the jersey upper back.
 
-JERSEY DESIGN:
-- NAME: "${params.nome}" (Font: Bold, Vectorized Sports Typography, White or contrasting color).
-- NUMBER: "${params.numero}" (Font: Large, Blocky, with thick outline).
-- KIT STYLE: Stylized vector version of "${params.clube}" kit.
-${kitContext}
-
-BACKGROUND:
-- Abstract artistic background.
-- Elements: Vertical paint streaks, grunge brush strokes, speed lines, geometric shards.
-- Colors: Explosion of the club's primary colors contrasting with a dark slate/black canvas.
+THE JERSEY (CRITICAL ACCURACY):
+- TEAM: ${params.clube}
+- ${kitRules}
+- NAME: "${params.nome}" (Upper back, Font: Official Sports Sans-Serif, Bold, Contrast Color).
+- NUMBER: "${params.numero}" (Center back, Large, Font: Blocky Sports Typography).
+- TEXTURE: Visible fabric texture (mesh/polyester sheen) but rendered in vector style.
 
 ${logoInstruction}
 
-TECHNICAL:
-- Aspect Ratio: ${params.aspectRatio}
-- Composition: Centered back view, powerful stance.
-- Lighting: Dramatic Rim Light (Backlight) outlining the character.
+BACKGROUND:
+- Abstract, energetic background using the PRIMARY COLORS of ${params.clube}.
+- Elements: Speed lines, splatter, geometric shapes. Dark vignette edges.
+
+STRICT RULES:
+1. DO NOT misspell the Name or Number.
+2. DO NOT invent random colors. USE OFFICIAL CLUB COLORS.
+3. IF A SPECIFIC PATTERN IS DEFINED (e.g., Stripes), USE IT.
+4. Aspect Ratio: ${params.aspectRatio === '16:9' ? 'Wide Landscape' : 'Vertical Portrait 9:16'}.
 `;
 };
 
@@ -122,9 +133,9 @@ export const editWallpaper = async (currentImageBase64: string, instruction: str
       contents: {
         parts: [
             {
-                text: `Edit this illustration. Instruction: "${instruction}". 
-                MAINTAIN THE VECTOR/CARTOON ART STYLE. Do not convert to photo.
-                Keep jersey design and text legible.`
+                text: `Edit this image. Instruction: "${instruction}". 
+                KEEP THE CLUB IDENTITY AND JERSEY COLORS. 
+                Maintain the vector art style.`
             },
             {
                 inlineData: {
